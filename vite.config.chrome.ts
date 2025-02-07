@@ -12,9 +12,17 @@ export default defineConfig({
         contentScript: resolve(__dirname, "src/content/contentScript.ts"),
       },
       output: {
-        entryFileNames: "[name].js",
-        chunkFileNames: "[name].js",
-        assetFileNames: "[name].[ext]",
+        entryFileNames: (chunkInfo) => {
+          if (
+            chunkInfo.name === "background" ||
+            chunkInfo.name === "contentScript"
+          ) {
+            return "[name].js";
+          }
+          return "assets/[name]-[hash].js";
+        },
+        chunkFileNames: "assets/[name]-[hash].js",
+        assetFileNames: "assets/[name]-[hash].[ext]",
       },
     },
     outDir: "dist-chrome",
@@ -23,5 +31,8 @@ export default defineConfig({
     alias: {
       "@": resolve(__dirname, "./src"),
     },
+  },
+  define: {
+    "process.env.NODE_ENV": JSON.stringify("production"),
   },
 });
